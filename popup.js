@@ -1,4 +1,4 @@
-const displayReminder = true;
+let displayReminder = true;
 
 const port = chrome.runtime.connect({
     name: "Sample Communication"
@@ -23,6 +23,7 @@ reminderButton?.addEventListener('click', async function () {
     const answer = confirm("A reminder will be shown at " + new Intl.DateTimeFormat('en-GB').format(date));
     if(answer){
         chrome.runtime.sendMessage({to: "TW_BACKGROUND", body: "SET_REMINDER", date});
+        displayReminder = false;
     }
 
     window.close();
