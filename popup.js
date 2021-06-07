@@ -2,15 +2,15 @@ const port = chrome.runtime.connect({
     name: "Sample Communication"
 });
 const displayReminder = false;
+const reminderButton = document.getElementById('reminder');
 if(displayReminder) {
-    const reminderButton = document.getElementById('reminder');
     chrome.storage.sync.get("showReminder", (items) => {
         if (items.showReminder !== "false") {
             reminderButton.style.display = "block";
         }
     });
 }
-
+                                                        
 reminderButton?.addEventListener('click', async function () {
     chrome.runtime.sendMessage({to: "TW_BACKGROUND", body: "SET_REMINDER"});
     await chrome.storage.sync.set({showReminder: "false"});
