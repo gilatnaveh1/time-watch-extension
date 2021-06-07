@@ -1,8 +1,8 @@
 {
-  "name": "time-Watch",
-  "version": "0.1",
+  "name": "Time Watch Puncher",
+  "version": "1.0",
   "manifest_version": 3,
-  "description": "fill timewatch",
+  "description": "fill timewatch on every month",
   "background": {
     "service_worker":   "background.js"
   },

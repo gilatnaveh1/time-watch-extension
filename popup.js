@@ -1,20 +1,32 @@
+const displayReminder = true;
+
 const port = chrome.runtime.connect({
     name: "Sample Communication"
 });
-const displayReminder = false;
-const reminderButton = document.getElementById('reminder');
-if(displayReminder) {
-    chrome.storage.sync.get("showReminder", (items) => {
-        if (items.showReminder !== "false") {
+window.onload = async ()=>{
+    console.log("onload");
+    const reminderButton = document.getElementById('reminder');
+    if(displayReminder) {
+        const twAlarm = await chrome.alarms.get("TimeWatchAlarm");
+        if(!twAlarm){
             reminderButton.style.display = "block";
         }
-    });
-}
-                                                        
+        /*chrome.storage.sync.get("showReminder", (items) => {});*/
+    }
+
+
 reminderButton?.addEventListener('click', async function () {
-    chrome.runtime.sendMessage({to: "TW_BACKGROUND", body: "SET_REMINDER"});
-    await chrome.storage.sync.set({showReminder: "false"});
+    let date = new Date();
+    date.setMonth(date.getDay() >= 21 ? date.getMonth() + 1 : date.getMonth());
+    date.setDate(21);
+    date.setHours(14,0,0,0);
+    const answer = confirm("A reminder will be shown at " + new Intl.DateTimeFormat('en-GB').format(date));
+    if(answer){
+        chrome.runtime.sendMessage({to: "TW_BACKGROUND", body: "SET_REMINDER", date});
+    }
+
     window.close();
+    // await chrome.storage.sync.set({showReminder: "false"});
 });
 
 
@@ -23,6 +35,8 @@ document.getElementById('start')?.addEventListener('click', async function () {
     chrome.runtime.sendMessage({to: "TW_BACKGROUND", body: "START", tabId: ctab.id});
 });
 
+
+};
 
 const getCurrentTab = function () {
     let queryOptions = {active: true, currentWindow: true};

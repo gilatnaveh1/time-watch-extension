@@ -16,7 +16,7 @@ const handleMessage = async function (msg, sender) {
     console.log("message received " + msg.body);
     switch (msg.body) {
         case "SET_REMINDER":
-            await addAlarm();
+            await addAlarm(msg.date);
             return;
         case "START":
             const tab = await login();
@@ -37,12 +37,9 @@ const removeOnUpdateListener = function (tabId) {
 
 
 const alarmName = "TimeWatchAlarm";
-const addAlarm = async function () {
-    let date = new Date();
-    date.setMonth(date.getDay() >= 21 ? date.getMonth() + 1 : date.getMonth());
-    date.setDate(21);
-    
-    let num = date.getTime();
+const addAlarm = async function (date) {
+    let num = new Date(date).getTime();
+    console.log("A reminder will be shown at " + new Date(date));
     chrome.alarms.create(alarmName, {when: num});
     await chrome.alarms.onAlarm.addListener(alarmListener);
 };
