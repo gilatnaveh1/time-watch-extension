@@ -1,5 +1,5 @@
 var s = document.createElement('script');
-s.src = chrome.runtime.getURL('start.js');
+s.src = chrome.runtime.getURL('login.js');
 s.onload = function () {
     this.remove();
 };

@@ -3,6 +3,13 @@ window.start_process = function() {
         console.log(document.documentURI + "is not valid for this extension");
         return;
     }
+    let cell = $('font:contains("Missing In/Out")').get(0);
+    
+    if(!cell){
+        const extensionId =  $("input[name='timeWatchExtensionId']")[0].value   
+        chrome.runtime.sendMessage(extensionId,{to: "TW_BACKGROUND", body: "FINISH"});
+        return;
+    }
     window.openWin = function (url, title, attrib) {
         console.log("window opening ....");
         const wref = window.open(url, title, attrib);
@@ -14,7 +21,7 @@ window.start_process = function() {
         window.update_popup = wref;
 
     };
-    let cell = $('font:contains("Missing In/Out")').get(0);
+    
     console.log("Filling cell");
     if(typeof cell !== "undefined"){
         cell.click();
@@ -31,4 +38,4 @@ window.start_process = function() {
     }
 }
 console.log("TimeWatch extension - start_process ");
- window.start_process();
+window.start_process();

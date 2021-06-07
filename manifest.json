@@ -1,16 +1,16 @@
 {
   "name": "time-Watch",
   "version": "0.1",
-  "manifest_version": 2,
+  "manifest_version": 3,
   "description": "fill timewatch",
   "background": {
-    "scripts": [
-      "background.js"
-    ],
-    "persistent": false
+    "service_worker":   "background.js"
   },
-  "web_accessible_resources": ["start.js"],
-  "browser_action": {
+  "web_accessible_resources": [{
+    "resources": ["content-script.js", "start.js", "login.js", "go-to-punch-data.js"],
+    "matches": ["<all_urls>"]
+  }],
+  "action": {
     "default_popup": "popup.html",
     "default_title": "Time Watch",
     "default_icon": "assets/images/icon128.png"
@@ -18,7 +18,15 @@
   "permissions": [
     "tabs",
     "activeTab",
-    "<all_urls>"
+    "alarms",
+    "notifications",
+    "scripting",
+    "contentSettings",
+    "debugger",
+    "storage"
+  ],
+  "host_permissions" : [
+    "https://*/"
   ],
   "icons": {
     "16": "assets/images/icon16.png",

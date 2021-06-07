@@ -1,18 +1,26 @@
-const port = chrome.extension.connect({
+const port = chrome.runtime.connect({
     name: "Sample Communication"
 });
+const displayReminder = false;
+if(displayReminder) {
+    const reminderButton = document.getElementById('reminder');
+    chrome.storage.sync.get("showReminder", (items) => {
+        if (items.showReminder !== "false") {
+            reminderButton.style.display = "block";
+        }
+    });
+}
 
-const button = document.getElementById('start');
-button.addEventListener('click', async function () {
-    console.log("Checking is url is supported");
+reminderButton?.addEventListener('click', async function () {
+    chrome.runtime.sendMessage({to: "TW_BACKGROUND", body: "SET_REMINDER"});
+    await chrome.storage.sync.set({showReminder: "false"});
+    window.close();
+});
+
+
+document.getElementById('start')?.addEventListener('click', async function () {
     const ctab = await getCurrentTab()
-    if (ctab && ctab.url.match("https://checkin.timewatch.co.il/punch/editwh.php.*").length > 0) {
-        console.log("url is supported");
-        port.postMessage({to: "TW_BACKGROUND", body: "START", tabId : ctab.id });
-    } else {
-        console.log("url is NOT supported");
-    }
-
+    chrome.runtime.sendMessage({to: "TW_BACKGROUND", body: "START", tabId: ctab.id});
 });
 
 

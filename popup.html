@@ -1,37 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Title</title>
-        <style>
-            body {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                box-sizing: border-box;
-            }
-            h1 {
-                text-transform: capitalize;
-                font-size: 20px;
-                color: #8D6DA1;
-            }
-            button {
-                background-color: #72CBAF;
-                color: white;
-                border: none;
-                outline: none;
-                border-radius: 4px;
-                padding: 8px 16px;
-                font-weight: 500;
-                font-size: 14px;
-            }
-        </style>
-    </head>
-    <body>
-        <img src="assets/images/watch2.png" width="200" height="200">
-        <h1>time watch puncher</h1>
-        <button id="start" value="">start</button>
-    </body>
-    <script src="popup.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <title>Time Watch</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+<img src="assets/images/watch2.png" class="logo">
+<h1>time watch puncher</h1>
+<button id="start" >start now</button>
+<button id="reminder" style="display: none">remind me</button>
+</body>
+<script src="popup.js"></script>
 </html>
