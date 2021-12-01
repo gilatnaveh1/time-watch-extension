@@ -8,6 +8,16 @@ chrome.runtime.onConnect.addListener(function () {
     }
 });
 
+chrome.runtime.onStartup.addListener(() => {
+    console.log("extension startup");
+    chrome.storage.sync.get("alarmWasSet", (items) => {
+        if (items.alarmWasSet) {
+            addAlarm();
+        }
+    });
+})
+
+
 const handleMessage = async function (msg, sender) {
     if (!msg || msg.to !== "TW_BACKGROUND") {
         console.log("dropping message - not to me");
@@ -16,7 +26,7 @@ const handleMessage = async function (msg, sender) {
     console.log("message received " + msg.body);
     switch (msg.body) {
         case "SET_REMINDER":
-            await addAlarm(msg.date);
+            await addAlarm();
             return;
         case "START":
             const tab = await login();
@@ -31,17 +41,30 @@ const handleMessage = async function (msg, sender) {
     }
 }
 
+const getDate = function () {
+    let date = new Date();
+    date.setMonth(date.getDate() >= 20 ? (date.getMonth() + 1) % 12 : date.getMonth());
+    date.setDate(20);
+    date.setHours(14, 0, 0, 0);
+    return date;
+}
+
 const removeOnUpdateListener = function (tabId) {
     chrome.tabs.onUpdated.removeListener(arguments.callee)
 }
 
 
 const alarmName = "TimeWatchAlarm";
-const addAlarm = async function (date) {
+const addAlarm = async function () {
+    const date = getDate();
+    const message = "A reminder will be shown at " + new Intl.DateTimeFormat('en-GB').format(date);
+    console.log(message);
     let num = new Date(date).getTime();
     console.log("A reminder will be shown at " + new Date(date));
     chrome.alarms.create(alarmName, {when: num});
     await chrome.alarms.onAlarm.addListener(alarmListener);
+    chrome.storage.sync.set({alarmWasSet: true});
+    chrome.runtime.sendMessage({to: "TW_POPUP", body: "RM_REMINDER_BUTTON", message});
 };
 
 async function alarmListener(alarm) {
@@ -134,20 +157,25 @@ const punchWholeMonth = async function (tabId) {
 const addOnUpdatedListener = async function (tab) {
     chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo) {
         if (tabId === tab.id && changeInfo.status && changeInfo.status === "complete") {
-            const tab = await chrome.tabs.get(tabId);
-            await chrome.debugger.detach({tabId});
-            if (tab.url && tab.url.match(".*punch/punch2_e.php.*")) {
-                await goToPunchData(tabId);
-                return;
-            }
-            if (tab.url && tab.url.match(".*punch/editwh.php.*")) {
-                await punchWholeMonth(tabId);
+            try {
+                const tab = await chrome.tabs.get(tabId);
+                // await chrome.debugger.detach({tabId});
+                if (tab.url && tab.url.match('.*punch/punch2_e.php.*')) {
+                    await goToPunchData(tabId);
+                    return;
+                }
+                if (tab.url && tab.url.match(".*punch/editwh.php.*")) {
+                    await punchWholeMonth(tabId);
+                }
+            } catch (e) {
+
+                console.log('error on addOnUpdatedListener:\n' + e.message);
+            }finally {
+                await chrome.debugger.detach({tabId});
             }
         }
     });
 }
-
-
 async function ensureConditionIsSet(callback) {
     return new Promise(function (resolve) {
         (async function waitForFoo() {
