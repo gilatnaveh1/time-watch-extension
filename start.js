@@ -4,9 +4,9 @@ window.start_process = function() {
         return;
     }
     let cell = $('font:contains("Missing In/Out")').get(0);
-    
+
     if(!cell){
-        const extensionId =  $("input[name='timeWatchExtensionId']")[0].value   
+        const extensionId =  $("input[name='timeWatchExtensionId']")[0].value
         chrome.runtime.sendMessage(extensionId,{to: "TW_BACKGROUND", body: "FINISH"});
         return;
     }
@@ -21,20 +21,20 @@ window.start_process = function() {
         window.update_popup = wref;
 
     };
-    
+
     console.log("Filling cell");
     if(typeof cell !== "undefined"){
         cell.click();
-        window.popup_window_loaded = window.setInterval(function () {
+        window.popup_window_loaded = window.setTimeout(function () {
             if (window.update_popup && window.update_popup.document.querySelector('input[name="B1"]')) {
                 $('#ehh0', window.update_popup.document).val('09');
                 $('#emm0', window.update_popup.document).val('00');
                 $('#xhh0', window.update_popup.document).val('18');
                 $('#xmm0', window.update_popup.document).val('00');
-                $('input[name="B1"]', window.update_popup.document).click();
+                $('input[name="B1"]', window.update_popup.document).trigger('click');
                 window.clearInterval(window.popup_window_loaded);
             }
-        }, 200);
+        }, 20);
     }
 }
 console.log("TimeWatch extension - start_process ");

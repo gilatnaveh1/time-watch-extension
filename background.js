@@ -34,6 +34,10 @@ const handleMessage = async function (msg, sender) {
             return;
         case "FINISH":
             removeOnUpdateListener(sender);
+            await chrome.tabs.update(sender.tab.id, {});
+            return
+        case "URL":
+            await chrome.tabs.update(sender.tab.id, {url: msg.message});
             return
         default:
             console.log("dropping invalid message");
@@ -171,7 +175,7 @@ const addOnUpdatedListener = async function (tab) {
 
                 console.log('error on addOnUpdatedListener:\n' + e.message);
             }finally {
-                await chrome.debugger.detach({tabId});
+                // await chrome.debugger.detach({tabId});
             }
         }
     });
