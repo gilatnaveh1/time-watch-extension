@@ -159,6 +159,7 @@ const punchWholeMonth = async function (tabId) {
         });
 }
 const addOnUpdatedListener = async function (tab) {
+    await chrome.debugger.detach({tabId: tab.id});
     chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo) {
         if (tabId === tab.id && changeInfo.status && changeInfo.status === "complete") {
             try {
