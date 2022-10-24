@@ -108,7 +108,7 @@ const login = async function () {
     try {
         console.log("login - start");
         const tab = await chrome.tabs.create({
-            url: 'https://checkin.timewatch.co.il/punch/punch.php',
+            url: 'https://c.timewatch.co.il/punch/punch.php',
             active: true
         });
         await ensureConditionIsSet(async () => {
@@ -165,7 +165,7 @@ const addOnUpdatedListener = async function (tab) {
             try {
                 const tab = await chrome.tabs.get(tabId);
                 // await chrome.debugger.detach({tabId});
-                if (tab.url && tab.url.match('.*punch/punch2_e.php.*')) {
+                if (tab.url && tab.url.match('.*punch/punch2.php.*')) {
                     await goToPunchData(tabId);
                     return;
                 }

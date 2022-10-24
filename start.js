@@ -1,42 +1,46 @@
-window.start_process = function() {
-    if (!document.documentURI.indexOf("timewatch") > 0) {
-        console.log(document.documentURI + "is not valid for this extension");
+const modalBodySelector = 'body.modal-open';
+window.fillCell = async function () {
+    console.log('Filling cell');
+    if ($(modalBodySelector).length > 0) {
+        $('div#modalContainer .modal-content #ehh0').val('09');
+        $('div#modalContainer .modal-content #emm0').val('00');
+        $('div#modalContainer .modal-content #xhh0').val('18');
+        $('div#modalContainer .modal-content #xmm0').val('00');
+        $('div#modalContainer .modal-content button.btn.modal-popup-btn-confirm').get(0).click();
+        await waitFor(() => $('div.jqi .jqiclose').css('display') !== 'block','waiting for spinner to disappear, current state: ' + $('div.jqi .jqiclose').css('display'));
+    } else {
+        console.log('no modal window was found');
+    }
+};
+
+window.waitFor = async function (callback, message) {
+    if (callback()) {
         return;
     }
-    let cell = $('font:contains("Missing In/Out")').get(0);
-
-    if(!cell){
-        const extensionId =  $("input[name='timeWatchExtensionId']")[0].value
-        chrome.runtime.sendMessage(extensionId,{to: "TW_BACKGROUND", body: "FINISH"});
+    console.log(message);
+    await new Promise(resolve => setTimeout(resolve, 200));
+    await waitFor(callback, message);
+};
+window.start_process = async function () {
+    if (!document.documentURI.indexOf('timewatch') > 0) {
+        console.log(document.documentURI + 'is not valid for this extension');
         return;
     }
-    window.openWin = function (url, title, attrib) {
-        console.log("window opening ....");
-        const wref = window.open(url, title, attrib);
+    let cell = $('td:contains("Entry/Exit missing")').get(0);
 
-        if (title == "map" || title == "sig") {
-            wref.moveTo(0, 0);
-            wref.resizeTo(screen.width, screen.height);
-        }
-        window.update_popup = wref;
-
-
-    };
-
-    console.log("Filling cell");
-    if(typeof cell !== "undefined"){
-        cell.click();
-        window.popup_window_loaded = window.setInterval(function () {
-            if (window.update_popup && window.update_popup.document.querySelector('input[name="B1"]')) {
-                $('#ehh0', window.update_popup.document).val('09');
-                $('#emm0', window.update_popup.document).val('00');
-                $('#xhh0', window.update_popup.document).val('18');
-                $('#xmm0', window.update_popup.document).val('00');
-                $('input[name="B1"]', window.update_popup.document).trigger('click');
-                window.clearInterval(window.popup_window_loaded);
-            }
-        }, 20);
+    if (!cell) {
+        window.postMessage({to: 'TW_BACKGROUND', body: 'FINISH'}, '*');
+        return;
     }
-}
-console.log("TimeWatch extension - start_process ");
+    if ($(modalBodySelector).length > 0) {
+        console.log('found modal open');
+        return;
+    }
+    cell.click();
+    await waitFor(()=>$(modalBodySelector).length > 0, 'waiting for modal dialog to show up');
+    console.log(`found ${$(modalBodySelector).length} modals`);
+    await fillCell();
+
+};
+console.log('TimeWatch extension - start_process ');
 window.start_process();
