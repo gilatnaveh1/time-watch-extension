@@ -1,3 +1,3 @@
-const companyInput = $("#compKeyboard");
+const companyInput = $("input#login-comp-input.compKeyboard");
 companyInput.val("2812");
-$("[name='B1']").trigger("click");
+$("button[type='submit']:contains('Log in')").trigger("click");
